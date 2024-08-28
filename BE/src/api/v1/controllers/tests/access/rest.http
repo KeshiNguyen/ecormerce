@@ -1,0 +1,20 @@
+@baseUrl= http://localhost:5000/v1/api/auth
+
+
+POST {{baseUrl}}/user/signup
+Content-Type: application/json
+x-api-key: d20555fc9d12c01e6f9ca8bf7e524d6d72c67e160474f214d4c12e0d7c901dc4891f36b0a042512db4b81c0192f98d443c9184be113c3ddffd5fa15b1cd32c8b
+{
+    "username": "abc xyz",
+    "password": "password",
+    "email": "absadasc@gmail.com"
+}
+
+POST {{baseUrl}}/product/create
+Content-Type: application/json
+x-api-key: d20555fc9d12c01e6f9ca8bf7e524d6d72c67e160474f214d4c12e0d7c901dc4891f36b0a042512db4b81c0192f98d443c9184be113c3ddffd5fa15b1cd32c8b
+x-client-id: 66980cb06a43ce0fd5f9a161
+authorization: 
+{
+    
+}
