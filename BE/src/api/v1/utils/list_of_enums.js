@@ -1,0 +1,14 @@
+
+const orderStatus = {
+    PENDING: 0,
+    CONFIRMED: 1,
+    PACKAGING: 2,
+    OUT_FOR_DELIVERY: 3,
+    DELIVERED: 4,
+    CANCELLED: 5,
+    RETURNED: 6,
+    FAILED_TO_DELIVER: 7,
+    SHIPPED: 8,
+    FAILED_TO_SHIP: 9,
+    COMPLETED: 10
+}
