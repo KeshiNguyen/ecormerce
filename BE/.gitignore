@@ -1,3 +1,7 @@
 
 #environment
 .env
+
+
+#module
+node_modules/

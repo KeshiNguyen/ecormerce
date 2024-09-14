@@ -4,11 +4,14 @@ import { BadRequestError } from '../../core/error.response.js';
 import { Order } from '../../models/index.model.js';
 import { findCart } from "../../models/repositories/cart.repo.js";
 import {
-    getAllOrders
+    getAllOrders,
+    getDetailOrder
 } from '../../models/repositories/order.repo.js';
 import { checkProductByServer } from '../../models/repositories/product.repo.js';
 import discountService from '../discount/index.js';
 import { acquireLock, releaseLock } from '../redis/redis.service.js';
+
+import { orderStatus, orderTrackingStatus } from '../../utils/list_of_enums.js';
 
 /*
     OrderService:: dịch vụ mua hàng
@@ -186,17 +189,72 @@ class CheckoutService {
     /*
         get detail of order
     */
-    static async getDetailOrderByUser () {}
+    static async getDetailOrderByUser ({orderId}) {
+        return await getDetailOrder({orderId})
+    }
 
     /*
         user cancel order
     */
-    static async cancelOrderByUser () {}
+    static async cancelOrderByUser ({orderId, cancel_reasons }) {
+        const foundOrder = await getDetailOrder({orderId})
+        if(!foundOrder) throw new BadRequestError('Order not found')
+        if(foundOrder?.order_status.code > 3 ) throw new BadRequestError('Cannot cancel order')
+        return await Order.findByIdAndUpdate(
+            {_id: orderId},
+            {
+                $set: {
+                    order_status: {
+                        code: 7
+                    },
+                    cancel_order_reason: cancel_reasons
+                }
+            },
+            {new: true}
+        )
+    }
 
     /*
         system/shop update status of order after process:pending => confirmed order => prepare order => delivered order => shipped order:  => completed
     */
-    static async updateOrderStatus () {}
+    static async updateOrderStatus ({orderId, code}) {
+        // const foundOrder = await getDetailOrder({orderId})
+        // if(!foundOrder) throw new BadRequestError('Order not found')
+        // if(foundOrder?.order_status.value > 2) throw new BadRequestError('Cannot cancel order')
+        const orderStatusValue = parseInt(code)
+        let status = Object.values(orderStatus).find(status => status.code === orderStatusValue)
+        return await Order.findByIdAndUpdate(
+            {_id: orderId},
+            {
+                $set: {
+                    order_status: status
+                }
+            },
+            {new: true}
+        )
+    }
+
+    static async trackingOrder ({orderId}) {
+        const foundOrder = await getTrackingOrderilOrder({orderId})
+        if(!foundOrder) throw new BadRequestError('Order not found')
+        return foundOrder
+    }
+
+    static async updateTrackingOrderStatus ({orderId, code}) {
+        // const foundOrder = await getTrackingOrder({orderId})
+        // if(!foundOrder) throw new BadRequestError('Order not found')
+        const orderStatusCode = parseInt(code)
+        let status = Object.values(orderTrackingStatus).find(status => status.code === orderStatusCode)
+        return await Order.findByIdAndUpdate(
+            {_id: orderId},
+            {
+                $set: {
+                    'order_tracking.status': status
+                }
+            },
+            {new: true}
+        )
+    }
 }
 
 export default CheckoutService;

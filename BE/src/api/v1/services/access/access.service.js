@@ -11,7 +11,7 @@ import KeyTokenService from './keyToken.service.js';
 import { getInfoData } from '../../utils/formatData.js';
 
 class AccessService {
-    static signUp = async ({email, username, password}) => {
+    static signUp = async ({email,  password}) => {
         const holderUser = await User.findOne({email}).lean();
         if(holderUser) {
             throw new BadRequestError('Error:: User already exists');
@@ -20,7 +20,6 @@ class AccessService {
         //create new user
         const newUser = await User.create({
             email,
-            username,
             password: passwordHash,
         })
         //create accessToken, refreshToken
@@ -39,6 +38,7 @@ class AccessService {
             const tokens = await createTokenPair({ userId: newUser._id, email }, publicKey, privateKey);
             await Info.create({
                 userId: newUser._id,
+                "profile.display_name": newUser._id,
             })
             return {
                 user: getInfoData({fields: ['_id', 'username', 'email', 'role'], object: newUser}),
