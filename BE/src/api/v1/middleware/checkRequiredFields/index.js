@@ -5,7 +5,6 @@ import { BadRequestError } from '../../core/error.response.js';
 
 const requiredFieldsSignUp = [
     body('email').exists().withMessage('Please enter an email address'),
-    body('username').exists().withMessage('Please enter name'),
     body('password')
         .isLength({ min: 8, max: 16 }).withMessage('Password must be between 8-16 characters')
         .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+[\]{}|;:'",.<>?/])[A-Za-z\d!@#$%^&*()\-_=+[\]{}|;:'",.<>?/]{8,16}$/)
