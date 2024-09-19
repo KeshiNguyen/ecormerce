@@ -3,8 +3,8 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 
 import { createTokenPair } from "../../auth/authUtils.js";
-import { AuthFailureError, BadRequestError, ForbiddenError, NotFoundError } from '../../core/error.response.js';
-import { Info, KeyToken, User } from "../../models/index.model.js";
+import { AuthFailureError, BadRequestError, ForbiddenError } from '../../core/error.response.js';
+import { Info, KeyToken, Shop, User } from "../../models/index.model.js";
 import UserService from '../user.service.js';
 import KeyTokenService from './keyToken.service.js';
 
@@ -137,17 +137,17 @@ class AccessService {
     }
 
     static shopSignUp = async (payload) => {
-        const {email, password} = payload
-        const holderShop = await User.findOne({ email: email, role: {$in: ['shop']}}).lean();
+        const {email, username, password} = payload
+        const holderShop = await Shop.findOne({ email: email }).lean();
         if(holderShop) {
             throw new BadRequestError('Error:: Shop already exists');
         }
         const passwordHash = await bcrypt.hash(password, 10);
         //create new shop
-        const newShop = await User.create({
+        const newShop = await Shop.create({
             email,
-            password: passwordHash,
-            role:['shop']
+            name:username,
+            password: passwordHash
         })
         //create accessToken, refreshToken
         if(newShop) {
@@ -169,8 +169,8 @@ class AccessService {
     }
 
     static shopLogin = async ({email, password}) => {
-        const foundShop = await User.findOne({ email, role: {$in: ['shop']}}).lean();
-        if(!foundShop) throw new NotFoundError('Shop not found');
+        const foundShop = await Shop.findOne({ email}).lean();
+        if(!foundShop) throw new BadRequestError('Shop not found');
         const isMatch = await bcrypt.compare(password, foundShop.password);
         if(!isMatch) throw new BadRequestError('Password not match');
 
@@ -193,14 +193,6 @@ class AccessService {
         }
     }
 
-    static addRoleShop = async ({userId}) => {
-        const user = await User.findOne({userId, role: {$in: ['customer']}} ).lean();
-        if(!user) throw new NotFoundError('User not found');
-        if(user.role.includes('shop')) throw new BadRequestError('User already register shop');
-        return await User.updateOne({userId}, {$push: {role: 'shop'}})
-    }
-
-    /*xac thuc shop CCCD */
     // static activeShop = async  (shopId, payload) => {
     //     const foundShop =  await Shop.findById(shopId)
     //     if(!foundShop) throw new BadRequestError('Shop not found');

@@ -91,8 +91,7 @@ const checkProductByServer = async (products) => {
             return {
                 price: foundProduct?.product_salePrice?.sale_price || foundProduct.product_price,
                 quantity: foundProduct.product_quantity > product.quantity ? product.quantity : foundProduct.product_quantity,
-                productId: foundProduct._id,
-                weight: foundProduct?.product_weight || foundProduct.product_dimensions?.volumetric_weight
+                productId: foundProduct._id
             }
         }
     }))

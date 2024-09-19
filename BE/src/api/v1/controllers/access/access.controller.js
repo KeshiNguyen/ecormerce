@@ -1,8 +1,8 @@
-'use strict'
-
 import { CREATED, SuccessResponse } from '../../core/success.response.js';
 
 import AccessService from "../../services/access/access.service.js";
+
+'use strict'
 
 class AccessController {
     //User Access
@@ -49,13 +49,6 @@ class AccessController {
                 user: req.user,
                 keyStore: req.keyStore
             })
-        }).send(res)
-    }
-
-    addRole = async (req, res, next) => {
-        new SuccessResponse({
-            message: 'Add role successfully',
-            metadata: await AccessService.addRoleShop(req.user.userId)
         }).send(res)
     }
 }

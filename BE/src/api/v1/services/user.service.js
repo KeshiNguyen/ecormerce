@@ -1,6 +1,6 @@
 'use strict'
 
-import { BadRequestError, ForbiddenError, NotFoundError } from "../core/error.response.js";
+import { BadRequestError, NotFoundError } from "../core/error.response.js";
 import { Info, User } from "../models/index.model.js";
 
 /*
@@ -107,9 +107,6 @@ class AccountService {
         ).select("addresses")
     }
 
-    // static setPickupAddress = async ({userId, address_id}) => {
-        
-    // }
     static addAddress = async ({addresses = {}, userId}) => {
         const addedInfo = await Info.findOneAndUpdate(
             {userId},
@@ -193,7 +190,7 @@ class AccountService {
             },
         )
         if (!foundAddress) {
-            throw new ForbiddenError("You have not permission to access this resource");
+            throw new NotFoundError("Address not found")
         }
         const addressToRemove = foundAddress.addresses.find(addr => addr.address.id === address_id);
         if(addressToRemove?.address_flag?.as_default && foundAddress.addresses.length > 1) throw new BadRequestError("Địa chỉ này đang để mặc định. Vui lòng chọn một địa chỉ khác làm mặc định trước khi xóa địa chỉ này!")
@@ -213,28 +210,6 @@ class AccountService {
                 lean: true
             }
         ).select("addresses")
-    }
-
-    static getAddressDefault = async ({userId}) => {
-        const user_address = await Info.findOne(
-            {userId, "addresses.address_flag.as_default": true},
-            {"addresses.$":1},
-            {lean: true}
-        )
-        if(!user_address) throw new BadRequestError('User chưa thiết lập địa chỉ mặc định')
-        return user_address.addresses[0]
-    }
-
-    static getAddressPickUp = async ({userId}) => {
-        const found_shop = await User.findOne({_id: userId, role: {$in: ["shop"]}}).lean()
-        if(!found_shop) throw new NotFoundError('Shop is not registered')
-        const shop_address = await Info.findOne(
-            {userId, "addresses.address_flag.as_pickup": true},
-            {"addresses.$":1},
-            {lean: true}
-        )
-        if(!shop_address) throw new BadRequestError('Shop chưa thiết lập địa chỉ lấy hàng')
-        return shop_address.addresses[0]
     }
 }
 

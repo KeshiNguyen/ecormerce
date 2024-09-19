@@ -1,9 +1,9 @@
-'use strict';
-
 import { BadRequestError } from '../../core/error.response.js';
 import { PRODUCT } from "../../models/product/product.model.js";
 import { CLOTH_PRODUCT, ELECTRONIC_PRODUCT, FURNITURE_PRODUCT } from "../../models/product/productAttribute.model.js";
 import { findAllDraftsShop } from "../../models/repositories/product.repo.js";
+
+'use strict';
 
 class ProductFactory {
     static productRegistry = {} //key - class
@@ -57,8 +57,7 @@ class ProductFactory {
 class Product {
     constructor({
         product_name,product_thumb,product_description,product_price,product_quantity,
-        product_type,product_shop,product_attributes,product_media, product_weight,
-        product_dimensions
+        product_type,product_shop,product_attributes,product_media
     }) {
         this.product_name = product_name;
         this.product_thumb = product_thumb;
@@ -69,8 +68,6 @@ class Product {
         this.product_shop = product_shop;
         this.product_attributes = product_attributes;
         this.product_media = product_media;
-        this.product_weight = product_weight;
-        this.product_dimensions = product_dimensions;
     }
 
     async createProduct(product_id) {

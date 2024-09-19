@@ -8,10 +8,8 @@ import {
     getDetailOrder
 } from '../../models/repositories/order.repo.js';
 import { checkProductByServer } from '../../models/repositories/product.repo.js';
-import DeliveryService from '../delivery/index.js';
 import discountService from '../discount/index.js';
 import { acquireLock, releaseLock } from '../redis/redis.service.js';
-import UserService from '../user.service.js';
 
 import { orderStatus, orderTrackingStatus } from '../../utils/list_of_enums.js';
 
@@ -38,7 +36,6 @@ class CheckoutService {
         payload:: {
             cartId,
             userId,
-            addressId,
             shop_order_ids: [
                 {//shop1
                     shopId,
@@ -75,7 +72,7 @@ class CheckoutService {
         /*
             review san pham truoc khi check out by user
         */
-    static async checkoutReview({cartId, userId, addressId,shop_order_ids=[]}) {
+    static async checkoutReview({cartId, userId, shop_order_ids=[]}) {
         // TODO: Implement checkout review process
 
         //Kiem tra cartId co ton tai hay khong
@@ -98,17 +95,10 @@ class CheckoutService {
         // const data = await CartService.getUserCartGroupedByShop({userId})
         // const shop_order_ids = data.shop_order_ids
         //tinh tong tien thanh toan
-        const user_address = await UserService.getAddressDefault({userId})
-        const user_address_code = await DeliveryService.getAddress({
-            province: user_address.address.city,
-            district: user_address.address.district,
-            ward: user_address.address.ward
-        })
-        
         for (let i = 0; i< shop_order_ids.length; i++) {
             const {shopId, shop_discounts = [], item_products = []} = shop_order_ids[i];
             const checkProductServer = await checkProductByServer(item_products)
-            // console.log(`find product::`, checkProductServer)
+            console.log(`find product::`, checkProductServer)
             if(!checkProductServer[0]) throw new BadRequestError('order wrong!')
 
             //tong tien don hang
@@ -141,40 +131,10 @@ class CheckoutService {
                     itemCheckout.priceApplyDiscount = checkoutPrice - discount
                 }
             }
-            //feeShip
-            const shop_address = await UserService.getAddressPickUp({userId: shopId})
-            const shop_address_code = await DeliveryService.getAddress({
-                province: shop_address.address.city,
-                district: shop_address.address.district,
-                ward: shop_address.address.ward
-            })
 
-            const services = await DeliveryService.getServices({
-                shop_id: 194444,
-                from_district: shop_address_code.district_id,
-                to_district : user_address_code.district_id
-            })
-
-            const weight = checkProductServer.reduce((acc, product) => {
-                return acc + product.weight * product.quantity
-            },0)
-
-            const service_id = weight > 20 ? services[0].service_id : services[1].service_id
-
-            const feeShip = await DeliveryService.getFee({
-                from_district_id: shop_address_code.district_id,
-                from_ward_code: shop_address_code.ward_code,
-                to_district_id: user_address_code.district_id,
-                to_ward_code: user_address_code.ward_code,
-                service_id,
-                weight
-            })
-
-            // console.log(feeShip)
-            // const shop_address = await Info.findOne({userId: shopId, "addresses.address_flag": true}, {"addresses.$.address": 1})
-            //tong thanh toan
+            //tong thanh toan 
             checkout_order.totalCheckout += itemCheckout.priceApplyDiscount
-            checkout_order.feeShip += feeShip.total
+
             checkout_order.totalPrice += checkoutPrice
             shop_order_ids_new.push(itemCheckout)
         }
