@@ -1,0 +1,10 @@
+#enviroment
+BE/src/.env
+
+#log
+logs/
+BE/Logs/
+
+#module
+BE/node_modules
+client/web/node_modules
