@@ -8,6 +8,7 @@ import discountRouter from './discount/index.js';
 import inventoryRouter from './inventory/index.js';
 import orderRouter from './order/index.js';
 import productRouter from './product/product.route.js';
+import accountRouter from './user/index.js';
 
 const router = Router();
 
@@ -22,7 +23,8 @@ router.use('/product', productRouter);
 router.use('/category', categoryRouter);
 router.use('/discount', discountRouter);
 router.use('/cart', cartRouter);
-router .use('/inventory', inventoryRouter)
+router.use('/inventory', inventoryRouter)
 router.use('/order', orderRouter);
+router.use('/account', accountRouter);
 
 export default router
