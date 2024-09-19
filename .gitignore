@@ -1,10 +1,10 @@
 #enviroment
-BE/src/.env
+BE/.env
 
 #log
 logs/
 BE/Logs/
 
 #module
-BE/node_modules
-client/web/node_modules
+BE/node_modules/
+client/web/node_modules/
