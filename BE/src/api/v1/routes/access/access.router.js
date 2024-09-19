@@ -28,4 +28,6 @@ router.use(authentication)
 router.post('/user/logout', asyncHandler(AccessController.logout) )
 
 router.post('/user/refreshtoken', asyncHandler(AccessController.handleRefreshToken) )
+
+router.post('/shop/addrole', asyncHandler(AccessController.addRole) )
 export default router

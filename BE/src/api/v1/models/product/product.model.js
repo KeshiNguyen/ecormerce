@@ -70,6 +70,25 @@ const ProductSchema = new Schema({
         type: Schema.Types.Mixed,
         required: true
     },
+    product_weight:{
+        type: Number,
+        default: 0
+    },
+    product_dimensions: {
+        length: {
+            type: Number, // chiều dài (cm)
+        },
+        width: {
+            type: Number,  // chiều rộng (cm)
+        },
+        height: {
+            type: Number,  // chiều cao (cm)
+        },
+        volumetric_weight: {
+            type: Number,  // khối lượng thể tích
+        }
+    },
+    
     product_media: {
         type: String,
     },
@@ -189,6 +208,13 @@ const updateMiddleware = function (next) {
     if (update.product_name) update.product_slug = slugify(update.product_name, { lower: true });
     next()
 }
+ProductSchema.pre('save', function (next) {
+    const dimensions = this.product_dimensions;
+    if (dimensions.length && dimensions.width && dimensions.height) {
+        this.product_dimensions.volumetric_weight = (dimensions.length * dimensions.width * dimensions.height) / 6000;
+    }
+    next();
+});
 
 ProductSchema.pre('findOneAndUpdate', updateMiddleware)
 ProductSchema.pre('updateOne', updateMiddleware)

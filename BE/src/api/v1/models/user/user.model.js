@@ -28,11 +28,11 @@ const UserSchemas = new Schema({
         unique: true,
         sparse: true
     },
-    role: {
+    role: [{
         type: [String],
         enum: ['customer', 'admin', 'shop'],
         default: ['customer'],
-    }
+    }]
 }, {
     timestamps: true,
     toJSON: { virtuals: true },

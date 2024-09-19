@@ -70,6 +70,7 @@ class ProductController {
             metadata: await productServiceV2.updateProduct(
                 req.body.update_item.product_type,
                 req.params.productId,
+                req.user.userId,
                 {
                     ...req.body.update_item
                 }

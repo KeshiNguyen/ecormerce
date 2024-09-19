@@ -1,7 +1,6 @@
+'use strict'
 import { model, Schema } from 'mongoose';
 import slugify from 'slugify';
-
-'use strict'
 
 const ProductSchema = new Schema({
     product_name: {
@@ -84,6 +83,24 @@ const ProductSchema = new Schema({
         type: Array,
         default: []
     },
+    product_weight:{
+        type: Number,
+        default: 0
+    },
+    product_dimensions: {
+        length: {
+            type: Number, // chiều dài (cm)
+        },
+        width: {
+            type: Number,  // chiều rộng (cm)
+        },
+        height: {
+            type: Number,  // chiều cao (cm)
+        },
+        volumetric_weight: {
+            type: Number,  // khối lượng thể tích
+        }
+    },
     isDraft: {
         type: Boolean,
         default: true,
@@ -165,6 +182,14 @@ ProductSchema.pre('save', function (next) {
     this.product_slug = slugify(this.product_name, { lower: true })
     next()
 })
+
+ProductSchema.pre('save', function (next) {
+    const dimensions = this.product_dimensions;
+    if (dimensions.length && dimensions.width && dimensions.height) {
+        this.product_dimensions.volumetric_weight = (dimensions.length * dimensions.width * dimensions.height) / 6000;
+    }
+    next();
+});
 
 const PRODUCT = model('ProductV3', ProductSchema)
 const CLOTH_PRODUCT = model('ClothProduct', clothingSchema)

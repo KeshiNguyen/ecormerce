@@ -4,6 +4,7 @@ import { apiKey, permission } from "../auth/checkAuth.js";
 import accessRouter from './access/access.router.js';
 import cartRouter from './cart/index.js';
 import categoryRouter from './category/index.js';
+import deliveryRouter from './delivery/index.js';
 import discountRouter from './discount/index.js';
 import inventoryRouter from './inventory/index.js';
 import orderRouter from './order/index.js';
@@ -26,5 +27,6 @@ router.use('/cart', cartRouter);
 router.use('/inventory', inventoryRouter)
 router.use('/order', orderRouter);
 router.use('/account', accountRouter);
+router.use('/delivery', deliveryRouter);
 
 export default router
