@@ -5,3 +5,5 @@
 
 #module
 node_modules/
+#log
+Logs/
