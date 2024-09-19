@@ -42,6 +42,20 @@ class AccountController {
         }).send(res)
     }
 
+    getAddressDefault = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Get address default successfully",
+            metadata: await AccountService.getAddressDefault(req.query)
+        }).send(res)
+    }
+
+    getAddressPickUp = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Get address pick up successfully",
+            metadata: await AccountService.getAddressPickUp(req.query)
+        }).send(res)
+    }
+
     //profile
     updateInfo = async (req, res, next) => {
         new SuccessResponse({

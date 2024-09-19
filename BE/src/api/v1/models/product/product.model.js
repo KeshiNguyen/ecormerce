@@ -70,6 +70,25 @@ const ProductSchema = new Schema({
         type: Schema.Types.Mixed,
         required: true
     },
+    product_weight:{
+        type: Number,
+        default: 0
+    },
+    product_dimensions: {
+        length: {
+            type: Number, // chiều dài (cm)
+        },
+        width: {
+            type: Number,  // chiều rộng (cm)
+        },
+        height: {
+            type: Number,  // chiều cao (cm)
+        },
+        volumetric_weight: {
+            type: Number,  // khối lượng thể tích
+        }
+    },
+    
     product_media: {
         type: String,
     },

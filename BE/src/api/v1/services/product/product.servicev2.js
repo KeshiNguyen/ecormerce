@@ -2,8 +2,7 @@
 import mongoose from 'mongoose';
 import omitEmpty from 'omit-empty';
 
-import { BadRequestError, NotFoundError } from '../../core/error.response.js';
-import { Shop } from '../../models/index.model.js';
+import { BadRequestError, ForbiddenError } from '../../core/error.response.js';
 import { CLOTH_PRODUCT, ELECTRONIC_PRODUCT, FURNITURE_PRODUCT, PRODUCT } from "../../models/product/product.model.js";
 import { createInventory } from '../../models/repositories/inventory.repo.js';
 import {
@@ -30,19 +29,20 @@ class ProductFactory {
         }
         return new productClass(payload).createProduct();
     }
-    static async updateProduct (product_type, productId, payload) {
+    static async updateProduct (product_type, productId,userId, payload) {
         const productClass = ProductFactory.productRegistry[product_type];
         if(!productClass) {
             throw new BadRequestError(`Invalid product type ${product_type}`);
         }
+        const foundShop = await PRODUCT.findById(productId).lean()
+        if(foundShop.product_shop != userId ) throw ForbiddenError('You have not permission to update this product');
         return new productClass(payload).updateProduct(productId);
     }
     /*----PUT----*/
 
     static publishProductByShop = async ({ product_shop, product_id }) => {
-        console.log(`product_id:: `, product_id)
-        const foundedShop = await Shop.findOne({ _id: product_shop });
-        if (!foundedShop) throw new NotFoundError('Shop not found');
+        const product = await PRODUCT.findOne({ _id: product_id, product_shop: product_shop}).lean();
+        if (!product) throw new BadRequestError('Input invalid');
         return await PRODUCT.findOneAndUpdate(
             { _id: product_id },
             {
@@ -53,8 +53,8 @@ class ProductFactory {
         )
     }
     static unPublishProductByShop = async ({ product_shop, product_id }) => {
-        const foundedShop = await Shop.findOne({ _id: product_shop });
-        if (!foundedShop) throw new NotFoundError('Shop not found');
+        const product = await PRODUCT.findOne({ _id: product_id, product_shop: product_shop}).lean();
+        if (!product) throw new BadRequestError('Input invalid');
         return await PRODUCT.findOneAndUpdate(
             { _id: product_id },
             {
@@ -100,7 +100,8 @@ class ProductFactory {
 class Product {
     constructor({
         product_name,product_thumb,product_description,product_price,product_quantity,
-        product_type,product_shop,product_attributes,product_media,product_salePrice
+        product_type,product_shop,product_attributes,product_media,product_salePrice,
+        product_weight, product_dimensions
     }) {
         this.product_name = product_name;
         this.product_thumb = product_thumb;
@@ -112,6 +113,8 @@ class Product {
         this.product_attributes = product_attributes;
         this.product_media = product_media;
         this.product_salePrice = product_salePrice;
+        this.product_weight = product_weight;
+        this.product_dimensions = product_dimensions;
     }
 
     async createProduct(product_id) {
